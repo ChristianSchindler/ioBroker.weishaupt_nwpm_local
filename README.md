@@ -89,8 +89,14 @@ Integer values that Modbus cannot deliver on this gateway:
 | `history.errors` / `history.locks`                                                                         | JSON | last 10 faults / lockouts (with timestamp + temps)                   |
 | `history.lastErrorTime` / `.lastErrorCode` / `.lastLockTime`                                               | —   | most recent fault / lockout                                          |
 
-> Energy counters are single registers (the kWh totals fit in one register — no
-> digit-group combination). DHW state mirrors the web UI's "Domestic hot water" tab
+> Energy counters are the gateway's display counters (single registers, no digit-group
+> combination). They equal the web UI's **main (resettable)** energy row. The UI's
+> separate **"…Total"** row adds an internal archive that the gateway does **not** expose
+> over Modbus/MQTT (verified by scanning all integer registers), so it cannot be read here.
+> Note: on mismatched firmware these counters may be mis-scaled (e.g. environmental >
+> generated), so treat energy values with caution.
+>
+> DHW state mirrors the web UI's "Domestic hot water" tab
 > (Request = `demand.hotWater`, Status = `hotWater.status`, Set temperature =
 > `hotWater.setTemperature`, Current temperature = `temperatures.hotWater`).
 
