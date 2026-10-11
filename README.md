@@ -16,9 +16,10 @@ no cloud required.
 
 The NWPM gateway exposes the heat-pump manager two ways:
 
-| Interface | Port | What it carries |
-|-----------|------|-----------------|
-| Modbus TCP | 502 | **Analog** sensor values + **digital** states only |
+
+| Interface               | Port  | What it carries                                                |
+| ----------------------- | ----- | -------------------------------------------------------------- |
+| Modbus TCP              | 502   | **Analog** sensor values + **digital** states only             |
 | MQTT (secure WebSocket) | 61898 | **everything**, including **integer** setpoints/modes/counters |
 
 Integer data points (setpoints, modes, energy counters) are **not** available over
@@ -44,15 +45,16 @@ https://github.com/ChristianSchindler/ioBroker.weishaupt_nwpm_local
 
 ## Configuration
 
-| Setting | Meaning |
-|---------|---------|
-| Gateway IP address | IP of the NWPM gateway (e.g. `192.168.1.50`) |
-| Modbus TCP port | usually `502` |
-| Modbus device/slave ID | usually `1` |
-| Poll interval | seconds between reads |
-| Enable control | turn on to read/write setpoints & modes via MQTT |
-| MQTT port / user | usually `61898` / `mqtt` |
-| Web UI / MQTT password | **your own** gateway password |
+
+| Setting                | Meaning                                          |
+| ---------------------- | ------------------------------------------------ |
+| Gateway IP address     | IP of the NWPM gateway (e.g.`192.168.1.50`)      |
+| Modbus TCP port        | usually`502`                                     |
+| Modbus device/slave ID | usually`1`                                       |
+| Poll interval          | seconds between reads                            |
+| Enable control         | turn on to read/write setpoints & modes via MQTT |
+| MQTT port / user       | usually`61898` / `mqtt`                          |
+| Web UI / MQTT password | **your own** gateway password                    |
 
 The password is stored **encrypted** by ioBroker (it is in `encryptedNative`) and is
 **never** part of this repository. Do not commit credentials.
@@ -72,19 +74,20 @@ The current **operating mode** (Sommer/Winter/Urlaub/Party/…) is the writable 
 
 Integer values that Modbus cannot deliver on this gateway:
 
-| State | Unit | Note |
-|-------|------|------|
-| `status.operatingState` | enum | current state: Aus/Heizen/Schwimmbad/Warmwasser/Kühlen/Energie-Opt. |
-| `hotWater.status` | enum | DHW status: Anforderung/Regenerativ/Spülzeit/Standzeit |
-| `hotWater.setTemperature` | °C | current DHW set temperature |
-| `energy.heating` | kWh | heat produced for heating |
-| `energy.hotWater` | kWh | heat produced for hot water |
-| `energy.generated` | kWh | total produced heat (= heating + hot water) |
-| `energy.environmental` | kWh | environmental energy harvested |
-| `runtime.compressor1` / `.fan` / `.heatingPump` / `.hotWaterPump` / `.additionalPump` / `.immersionHeater` | h | operating hours |
-| `cycles.compressor1Total` / `.compressor1Heating` / `.compressor1HotWater` | — | compressor cycle counts |
-| `history.errors` / `history.locks` | JSON | last 10 faults / lockouts (with timestamp + temps) |
-| `history.lastErrorTime` / `.lastErrorCode` / `.lastLockTime` | — | most recent fault / lockout |
+
+| State                                                                                                      | Unit | Note                                                                 |
+| ---------------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
+| `status.operatingState`                                                                                    | enum | current state: Aus/Heizen/Schwimmbad/Warmwasser/Kühlen/Energie-Opt. |
+| `hotWater.status`                                                                                          | enum | DHW status: Anforderung/Regenerativ/Spülzeit/Standzeit              |
+| `hotWater.setTemperature`                                                                                  | °C  | current DHW set temperature                                          |
+| `energy.heating`                                                                                           | kWh  | heat produced for heating                                            |
+| `energy.hotWater`                                                                                          | kWh  | heat produced for hot water                                          |
+| `energy.generated`                                                                                         | kWh  | total produced heat (= heating + hot water)                          |
+| `energy.environmental`                                                                                     | kWh  | environmental energy harvested                                       |
+| `runtime.compressor1` / `.fan` / `.heatingPump` / `.hotWaterPump` / `.additionalPump` / `.immersionHeater` | h    | operating hours                                                      |
+| `cycles.compressor1Total` / `.compressor1Heating` / `.compressor1HotWater`                                 | —   | compressor cycle counts                                              |
+| `history.errors` / `history.locks`                                                                         | JSON | last 10 faults / lockouts (with timestamp + temps)                   |
+| `history.lastErrorTime` / `.lastErrorCode` / `.lastLockTime`                                               | —   | most recent fault / lockout                                          |
 
 > Energy counters are single registers (the kWh totals fit in one register — no
 > digit-group combination). DHW state mirrors the web UI's "Domestic hot water" tab
@@ -93,14 +96,15 @@ Integer values that Modbus cannot deliver on this gateway:
 
 ### Control (read/write, MQTT — only when "Enable MQTT" is on)
 
-| State | Range | Note |
-|-------|-------|------|
-| `control.hotWaterSetpoint` | 30–85 °C | hot-water target |
-| `control.curveShiftHk1` | 0–38 | heating-curve parallel shift; `value − 19 = K` |
-| `control.curveEndpointHk1` | 20–70 °C | heating-curve steepness |
-| `control.holidayDays` | 0–150 | holiday duration |
-| `control.partyHours` | 0–72 | party duration |
-| `control.operatingMode` | enum | 0 Sommer · 1 Winter · 2 Urlaub · 3 Party · 4 2. Wärmeerzeuger · 5 Kühlung · 6 Auto (dropdown) |
+
+| State                      | Range      | Note                                                                                                  |
+| -------------------------- | ---------- | ----------------------------------------------------------------------------------------------------- |
+| `control.hotWaterSetpoint` | 30–85 °C | hot-water target                                                                                      |
+| `control.curveShiftHk1`    | 0–38      | heating-curve parallel shift;`value − 19 = K`                                                        |
+| `control.curveEndpointHk1` | 20–70 °C | heating-curve steepness                                                                               |
+| `control.holidayDays`      | 0–150     | holiday duration                                                                                      |
+| `control.partyHours`       | 0–72      | party duration                                                                                        |
+| `control.operatingMode`    | enum       | 0 Sommer · 1 Winter · 2 Urlaub · 3 Party · 4 2. Wärmeerzeuger · 5 Kühlung · 6 Auto (dropdown) |
 
 To change the **flow (Vorlauf) temperature** on a weather-compensated circuit, adjust
 `control.curveShiftHk1` (each step ≈ 1 K).
@@ -114,6 +118,7 @@ point list. Issues and pull requests welcome.
 ## Changelog
 
 ### 0.1.0
+
 - Initial release: Modbus monitoring + optional MQTT control.
 
 ## License
