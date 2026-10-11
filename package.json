@@ -1,0 +1,52 @@
+{
+  "name": "iobroker.weishaupt_nwpm_local",
+  "version": "0.1.0",
+  "description": "Local Weishaupt / Dimplex heat-pump data via the NWPM gateway (Modbus TCP + MQTT) - no cloud required",
+  "author": {
+    "name": "Christian Schindler",
+    "email": "christian.schindler@warr.de"
+  },
+  "homepage": "https://github.com/ChristianSchindler/ioBroker.weishaupt_nwpm_local",
+  "license": "MIT",
+  "keywords": [
+    "ioBroker",
+    "weishaupt",
+    "dimplex",
+    "nwpm",
+    "heat pump",
+    "wärmepumpe",
+    "modbus",
+    "mqtt",
+    "local"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ChristianSchindler/ioBroker.weishaupt_nwpm_local.git"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@iobroker/adapter-core": "^3.2.3",
+    "modbus-serial": "^8.0.21",
+    "mqtt": "^5.10.1"
+  },
+  "devDependencies": {
+    "@iobroker/testing": "^5.0.0"
+  },
+  "main": "main.js",
+  "files": [
+    "admin/",
+    "lib/",
+    "io-package.json",
+    "LICENSE",
+    "main.js"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
+  "bugs": {
+    "url": "https://github.com/ChristianSchindler/ioBroker.weishaupt_nwpm_local/issues"
+  },
+  "readmeFilename": "README.md"
+}

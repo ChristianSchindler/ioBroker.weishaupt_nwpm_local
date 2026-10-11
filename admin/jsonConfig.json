@@ -1,0 +1,100 @@
+{
+  "i18n": false,
+  "type": "panel",
+  "items": {
+    "_connHeader": {
+      "type": "header",
+      "size": 2,
+      "text": "Connection"
+    },
+    "host": {
+      "type": "text",
+      "label": "Gateway IP address",
+      "help": "IP of the NWPM gateway (web UI host), e.g. 192.168.1.50",
+      "sm": 12,
+      "md": 6,
+      "lg": 4
+    },
+    "modbusPort": {
+      "type": "number",
+      "label": "Modbus TCP port",
+      "min": 1,
+      "max": 65535,
+      "default": 502,
+      "sm": 6,
+      "md": 3,
+      "lg": 2
+    },
+    "deviceId": {
+      "type": "number",
+      "label": "Modbus device/slave ID",
+      "min": 0,
+      "max": 255,
+      "default": 1,
+      "sm": 6,
+      "md": 3,
+      "lg": 2
+    },
+    "pollInterval": {
+      "type": "number",
+      "label": "Poll interval (seconds)",
+      "min": 5,
+      "max": 3600,
+      "default": 30,
+      "sm": 6,
+      "md": 3,
+      "lg": 2
+    },
+    "_modbusHint": {
+      "type": "staticText",
+      "text": "Enable 'Modbus TCP Port 502' and 'Network services' in the gateway web UI (Settings -> Gateway access), then restart the gateway.",
+      "newLine": true
+    },
+    "_ctrlHeader": {
+      "type": "header",
+      "size": 2,
+      "text": "Extended values & control (optional, via MQTT)",
+      "newLine": true
+    },
+    "enableControl": {
+      "type": "checkbox",
+      "label": "Enable MQTT (energy/runtime counters + setpoints/modes)",
+      "help": "Integer values (energy kWh, runtimes, cycle counts, setpoints, modes, flow curve) are only reachable over the gateway's MQTT interface, not Modbus. Requires the gateway password.",
+      "default": false,
+      "sm": 12,
+      "md": 6,
+      "lg": 4
+    },
+    "mqttPort": {
+      "type": "number",
+      "label": "MQTT (wss) port",
+      "min": 1,
+      "max": 65535,
+      "default": 61898,
+      "hidden": "!data.enableControl",
+      "sm": 6,
+      "md": 3,
+      "lg": 2
+    },
+    "mqttUser": {
+      "type": "text",
+      "label": "MQTT user",
+      "default": "mqtt",
+      "hidden": "!data.enableControl",
+      "sm": 6,
+      "md": 3,
+      "lg": 2
+    },
+    "mqttPassword": {
+      "type": "password",
+      "label": "Web UI / MQTT password",
+      "help": "Your own gateway password. Stored encrypted by ioBroker; never committed to the repository.",
+      "visible": true,
+      "repeat": false,
+      "hidden": "!data.enableControl",
+      "sm": 12,
+      "md": 6,
+      "lg": 4
+    }
+  }
+}

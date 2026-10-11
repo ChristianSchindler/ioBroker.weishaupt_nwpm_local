@@ -1,0 +1,99 @@
+{
+  "common": {
+    "name": "weishaupt_nwpm_local",
+    "version": "0.1.0",
+    "news": {
+      "0.1.0": {
+        "en": "Initial release: local monitoring (Modbus TCP) and optional control (MQTT) for Weishaupt/Dimplex NWPM heat-pump gateways.",
+        "de": "Erstveröffentlichung: lokales Monitoring (Modbus TCP) und optionale Steuerung (MQTT) für Weishaupt/Dimplex NWPM-Wärmepumpen-Gateways."
+      }
+    },
+    "title": "Weishaupt NWPM local",
+    "titleLang": {
+      "en": "Weishaupt NWPM local",
+      "de": "Weishaupt NWPM lokal"
+    },
+    "desc": {
+      "en": "Local data from Weishaupt/Dimplex heat pumps via the NWPM gateway (Modbus TCP for monitoring, MQTT for setpoints/modes). No cloud required.",
+      "de": "Lokale Daten von Weishaupt/Dimplex-Wärmepumpen über das NWPM-Gateway (Modbus TCP für Monitoring, MQTT für Sollwerte/Modi). Keine Cloud nötig."
+    },
+    "authors": [
+      "Christian Schindler <christian.schindler@warr.de>"
+    ],
+    "keywords": [
+      "weishaupt",
+      "dimplex",
+      "nwpm",
+      "heat pump",
+      "modbus",
+      "mqtt",
+      "local"
+    ],
+    "license": "MIT",
+    "platform": "Javascript/Node.js",
+    "main": "main.js",
+    "icon": "weishaupt_nwpm_local.png",
+    "enabled": true,
+    "extIcon": "https://raw.githubusercontent.com/ChristianSchindler/ioBroker.weishaupt_nwpm_local/main/admin/weishaupt_nwpm_local.png",
+    "readme": "https://github.com/ChristianSchindler/ioBroker.weishaupt_nwpm_local/blob/main/README.md",
+    "loglevel": "info",
+    "mode": "daemon",
+    "type": "climate-control",
+    "compact": true,
+    "connectionType": "local",
+    "dataSource": "poll",
+    "adminUI": {
+      "config": "json"
+    },
+    "dependencies": [
+      {
+        "js-controller": ">=5.0.0"
+      }
+    ],
+    "globalDependencies": [
+      {
+        "admin": ">=7.0.0"
+      }
+    ]
+  },
+  "native": {
+    "host": "",
+    "modbusPort": 502,
+    "deviceId": 1,
+    "pollInterval": 30,
+    "enableControl": false,
+    "mqttPort": 61898,
+    "mqttUser": "mqtt",
+    "mqttPassword": ""
+  },
+  "protectedNative": [
+    "mqttPassword"
+  ],
+  "encryptedNative": [
+    "mqttPassword"
+  ],
+  "objects": [],
+  "instanceObjects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.connection",
+      "type": "state",
+      "common": {
+        "role": "indicator.connected",
+        "name": "Device or service connected",
+        "type": "boolean",
+        "read": true,
+        "write": false,
+        "def": false
+      },
+      "native": {}
+    }
+  ]
+}
