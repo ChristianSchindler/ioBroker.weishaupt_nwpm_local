@@ -1,0 +1,76 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version (x.y.z)"
+        required: true
+      changelog:
+        description: "Changelog for this release"
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+
+      - name: Validate version
+        env:
+          VERSION: ${{ github.event.inputs.version }}
+        run: |
+          echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || { echo "Version must look like 1.2.3."; exit 1; }
+          if git rev-parse "v$VERSION" >/dev/null 2>&1; then echo "Tag v$VERSION already exists"; exit 1; fi
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Set version
+        env:
+          VERSION: ${{ github.event.inputs.version }}
+          CHANGELOG: ${{ github.event.inputs.changelog }}
+        run: node scripts/set-version.mjs "$VERSION" "$CHANGELOG"
+
+      - name: Run tests
+        run: npm test
+
+      - name: Pack
+        run: npm pack
+
+      - name: Commit, tag and push
+        env:
+          VERSION: ${{ github.event.inputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package.json io-package.json
+          git commit -m "Release v$VERSION"
+          git tag "v$VERSION"
+          git push origin HEAD:main
+          git push origin "v$VERSION"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ github.event.inputs.version }}
+          CHANGELOG: ${{ github.event.inputs.changelog }}
+        run: |
+          REPO="ChristianSchindler/ioBroker.weishaupt_nwpm_local"
+          {
+            printf '%s\n\n' "$CHANGELOG"
+            printf '## Installation\n\n'
+            printf 'In ioBroker install from the custom URL:\n\n'
+            printf '    iobroker url https://github.com/%s/tarball/v%s\n' "$REPO" "$VERSION"
+          } > /tmp/notes.md
+          gh release create "v$VERSION" ./*.tgz --title "v$VERSION" --notes-file /tmp/notes.md
