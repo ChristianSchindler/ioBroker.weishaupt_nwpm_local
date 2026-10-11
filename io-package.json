@@ -4,8 +4,8 @@
     "version": "0.1.0",
     "news": {
       "0.1.0": {
-        "en": "Initial release: local monitoring (Modbus TCP) and optional control (MQTT) for Weishaupt/Dimplex NWPM heat-pump gateways.",
-        "de": "Erstveröffentlichung: lokales Monitoring (Modbus TCP) und optionale Steuerung (MQTT) für Weishaupt/Dimplex NWPM-Wärmepumpen-Gateways."
+        "en": "Initial release: local monitoring (Modbus TCP) and optional control (MQTT) for Weishaupt/Dimplex NWPM heat-pump gateways — no cloud required.",
+        "de": "Initial release: local monitoring (Modbus TCP) and optional control (MQTT) for Weishaupt/Dimplex NWPM heat-pump gateways — no cloud required."
       }
     },
     "title": "Weishaupt NWPM local",
