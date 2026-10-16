@@ -1,8 +1,12 @@
 {
   "common": {
     "name": "weishaupt_nwpm_local",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "news": {
+      "0.1.2": {
+        "en": "dd derived electrical energy (energy.electrical) and COP (energy.cop); rename hotWater.setTemperature to hotWater.currentSetpoint and group setback times under hotWater.setback.*",
+        "de": "dd derived electrical energy (energy.electrical) and COP (energy.cop); rename hotWater.setTemperature to hotWater.currentSetpoint and group setback times under hotWater.setback.*"
+      },
       "0.1.1": {
         "en": "Energie-Werte (Wärmemenge) an Reglerdisplay angepasst; Betriebszustand, Warmwasser-Status + WW-Absenkzeiten (einseh- und konfigurierbar) ergänzt",
         "de": "Energie-Werte (Wärmemenge) an Reglerdisplay angepasst; Betriebszustand, Warmwasser-Status + WW-Absenkzeiten (einseh- und konfigurierbar) ergänzt"
