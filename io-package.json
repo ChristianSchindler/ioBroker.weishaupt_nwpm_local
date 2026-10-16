@@ -1,8 +1,12 @@
 {
   "common": {
     "name": "weishaupt_nwpm_local",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "news": {
+      "0.1.1": {
+        "en": "Energie-Werte (Wärmemenge) an Reglerdisplay angepasst; Betriebszustand, Warmwasser-Status + WW-Absenkzeiten (einseh- und konfigurierbar) ergänzt",
+        "de": "Energie-Werte (Wärmemenge) an Reglerdisplay angepasst; Betriebszustand, Warmwasser-Status + WW-Absenkzeiten (einseh- und konfigurierbar) ergänzt"
+      },
       "0.1.0": {
         "en": "Initial release: local monitoring (Modbus TCP) and optional control (MQTT) for Weishaupt/Dimplex NWPM heat-pump gateways — no cloud required.",
         "de": "Initial release: local monitoring (Modbus TCP) and optional control (MQTT) for Weishaupt/Dimplex NWPM heat-pump gateways — no cloud required."
