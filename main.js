@@ -60,7 +60,7 @@ class WeishauptNwpmLocal extends utils.Adapter {
         if (this.config.enableControl) {
             for (const r of MQTT_MONITOR) {
                 const common = {
-                    name: r.name, type: "number", role: r.role, unit: r.unit || "",
+                    name: r.name, type: r.type || "number", role: r.role, unit: r.unit || "",
                     read: true, write: false,
                 };
                 if (r.states) common.states = r.states;
@@ -85,6 +85,13 @@ class WeishauptNwpmLocal extends utils.Adapter {
     }
 
     async readMqttPoint(r) {
+        // Two registers (hour, minute) formatted as "HH:MM"
+        if (r.time) {
+            const h = await this.mqtt.read(r.time[0]);
+            const mi = await this.mqtt.read(r.time[1]);
+            if (h === null || h === undefined || mi === null || mi === undefined) return null;
+            return `${String(Number(h)).padStart(2, "0")}:${String(Number(mi)).padStart(2, "0")}`;
+        }
         // Multi-register counter split into 4-digit groups: ST1bis4 + ST5bis8*1e4 + ST9bis12*1e8
         if (r.combine) {
             let total = 0;
