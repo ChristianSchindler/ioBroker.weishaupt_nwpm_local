@@ -79,7 +79,8 @@ Integer values that Modbus cannot deliver on this gateway:
 | ---------------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
 | `status.operatingState`                                                                                    | enum | current state: Aus/Heizen/Schwimmbad/Warmwasser/Kühlen/Energie-Opt. |
 | `hotWater.status`                                                                                          | enum | DHW status: Anforderung/Regenerativ/Spülzeit/Standzeit              |
-| `hotWater.setTemperature`                                                                                  | °C  | current DHW set temperature                                          |
+| `hotWater.currentSetpoint`                                                                                 | °C  | current DHW set temperature (reflects setback reduction)             |
+| `hotWater.setback.time1Start` / `.time1End` / `.time2Start` / `.time2End`                                  | HH:MM | DHW setback windows — **writable** (Zeit 2 unused but configurable) |
 | `energy.heating`                                                                                           | kWh  | heat produced for heating                                            |
 | `energy.hotWater`                                                                                          | kWh  | heat produced for hot water                                          |
 | `energy.generated`                                                                                         | kWh  | total produced heat (= heating + hot water)                          |
@@ -98,7 +99,10 @@ Integer values that Modbus cannot deliver on this gateway:
 >
 > DHW state mirrors the web UI's "Domestic hot water" tab
 > (Request = `demand.hotWater`, Status = `hotWater.status`, Set temperature =
-> `hotWater.setTemperature`, Current temperature = `temperatures.hotWater`).
+> `hotWater.currentSetpoint`, Current temperature = `temperatures.hotWater`).
+> `hotWater.currentSetpoint` is the *currently active* target: during a setback
+> window (`hotWater.setback.*`) it shows the reduced value, not the comfort target.
+> The comfort target you set is `control.hotWaterSetpoint`.
 
 ### Control (read/write, MQTT — only when "Enable MQTT" is on)
 
