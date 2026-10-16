@@ -85,6 +85,8 @@ Integer values that Modbus cannot deliver on this gateway:
 | `energy.hotWater`                                                                                          | kWh  | heat produced for hot water                                          |
 | `energy.generated`                                                                                         | kWh  | total produced heat (= heating + hot water)                          |
 | `energy.environmental`                                                                                     | kWh  | environmental energy harvested                                       |
+| `energy.electrical`                                                                                        | kWh  | **electrical energy consumed** (derived: `generated − environmental`) |
+| `energy.cop`                                                                                               | —   | seasonal performance factor (derived: `generated / electrical`)      |
 | `runtime.compressor1` / `.fan` / `.heatingPump` / `.hotWaterPump` / `.additionalPump` / `.immersionHeater` | h    | operating hours                                                      |
 | `cycles.compressor1Total` / `.compressor1Heating` / `.compressor1HotWater`                                 | —   | compressor cycle counts                                              |
 | `history.errors` / `history.locks`                                                                         | JSON | last 10 faults / lockouts (with timestamp + temps)                   |
@@ -96,6 +98,13 @@ Integer values that Modbus cannot deliver on this gateway:
 > 22670, Umweltenergie 17998 kWh). Note: the Dimplex **web** UI shows different, incorrect
 > numbers for these on mismatched firmware — the controller display (and this combine) is
 > authoritative.
+>
+> This gateway exposes **no electrical power/energy** register (the live-power registers
+> read 0 even while the compressor runs). `energy.electrical` is therefore derived from the
+> energy balance *produced heat = environmental heat + electrical energy*, i.e.
+> `energy.generated − energy.environmental`. It is as accurate as the device's own thermal
+> counters and matches the consumption figure shown on the controller display. For a true
+> metered value, add an external power meter (e.g. Shelly 3EM) on the heat-pump supply.
 >
 > DHW state mirrors the web UI's "Domestic hot water" tab
 > (Request = `demand.hotWater`, Status = `hotWater.status`, Set temperature =

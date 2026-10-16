@@ -67,6 +67,10 @@ class WeishauptNwpmLocal extends utils.Adapter {
                 common.write = !!r.writable;
                 await mk(r.id, common);
             }
+            // Derived electrical energy + COP. This gateway exposes no electrical counter,
+            // but energy balance gives it: electrical = generated - environmental.
+            await mk("energy.electrical", { name: "Stromverbrauch (berechnet: erzeugt − Umwelt)", type: "number", role: "value.energy", unit: "kWh", read: true, write: false });
+            await mk("energy.cop", { name: "Arbeitszahl JAZ (berechnet: erzeugt / Strom)", type: "number", role: "value", read: true, write: false });
             // Fault / lock history (from MQTT broadcast topics)
             await mk("history.errors", { name: "Fehler-Historie (JSON)", type: "string", role: "json", read: true, write: false });
             await mk("history.locks", { name: "Sperr-Historie (JSON)", type: "string", role: "json", read: true, write: false });
@@ -157,10 +161,21 @@ class WeishauptNwpmLocal extends utils.Adapter {
             await this.setStateAsync("info.connection", { val: true, ack: true });
 
             if (this.config.enableControl && this.mqtt && this.mqtt.connected) {
+                let eGenerated = null, eEnvironmental = null;
                 for (const r of [...MQTT_MONITOR, ...MQTT_POINTS]) {
                     const val = await this.readMqttPoint(r);
                     if (val === null || val === undefined) continue;
+                    if (r.id === "energy.generated") eGenerated = Number(val);
+                    if (r.id === "energy.environmental") eEnvironmental = Number(val);
                     await this.setStateChangedAsync(r.id, { val, ack: true });
+                }
+                // Derived: electrical energy consumed = produced heat - environmental heat.
+                if (eGenerated !== null && eEnvironmental !== null) {
+                    const electrical = Math.round((eGenerated - eEnvironmental) * 1000) / 1000;
+                    await this.setStateChangedAsync("energy.electrical", { val: electrical, ack: true });
+                    if (electrical > 0) {
+                        await this.setStateChangedAsync("energy.cop", { val: Math.round((eGenerated / electrical) * 100) / 100, ack: true });
+                    }
                 }
                 await this.updateHistory();
             }
