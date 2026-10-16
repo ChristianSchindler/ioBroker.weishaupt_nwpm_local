@@ -85,6 +85,16 @@ class WeishauptNwpmLocal extends utils.Adapter {
     }
 
     async readMqttPoint(r) {
+        // Multi-register counter split into 4-digit groups: ST1bis4 + ST5bis8*1e4 + ST9bis12*1e8
+        if (r.combine) {
+            let total = 0;
+            for (let i = 0; i < r.combine.length; i++) {
+                const v = await this.mqtt.read(r.combine[i]);
+                if (v === null || v === undefined) return null;
+                total += Number(v) * Math.pow(10, 4 * i);
+            }
+            return total;
+        }
         const v = await this.mqtt.read(r.point);
         if (v === null || v === undefined) return null;
         let num = Number(v);

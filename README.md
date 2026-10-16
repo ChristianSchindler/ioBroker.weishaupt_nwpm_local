@@ -89,12 +89,12 @@ Integer values that Modbus cannot deliver on this gateway:
 | `history.errors` / `history.locks`                                                                         | JSON | last 10 faults / lockouts (with timestamp + temps)                   |
 | `history.lastErrorTime` / `.lastErrorCode` / `.lastLockTime`                                               | —   | most recent fault / lockout                                          |
 
-> Energy counters are the gateway's display counters (single registers, no digit-group
-> combination). They equal the web UI's **main (resettable)** energy row. The UI's
-> separate **"…Total"** row adds an internal archive that the gateway does **not** expose
-> over Modbus/MQTT (verified by scanning all integer registers), so it cannot be read here.
-> Note: on mismatched firmware these counters may be mis-scaled (e.g. environmental >
-> generated), so treat energy values with caution.
+> Energy counters are 12-digit values split across three 4-digit registers and combined as
+> `ST1bis4 + ST5bis8*1e4 + ST9bis12*1e8`. The combined values match the heat-pump
+> **controller display** exactly (e.g. Heizen 10512, Warmwasser 12158, Wärmepumpe gesamt
+> 22670, Umweltenergie 17998 kWh). Note: the Dimplex **web** UI shows different, incorrect
+> numbers for these on mismatched firmware — the controller display (and this combine) is
+> authoritative.
 >
 > DHW state mirrors the web UI's "Domestic hot water" tab
 > (Request = `demand.hotWater`, Status = `hotWater.status`, Set temperature =
