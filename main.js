@@ -31,9 +31,9 @@ class WeishauptNwpmLocal extends utils.Adapter {
 
         await this.createObjects();
 
-        // Control states are writable -> listen for changes.
+        // Writable states (control.* and some hotWater.*) -> listen for changes.
         if (this.config.enableControl) {
-            this.subscribeStates("control.*");
+            this.subscribeStates("*");
             await this.connectMqtt();
         }
 
@@ -64,6 +64,7 @@ class WeishauptNwpmLocal extends utils.Adapter {
                     read: true, write: false,
                 };
                 if (r.states) common.states = r.states;
+                common.write = !!r.writable;
                 await mk(r.id, common);
             }
             // Fault / lock history (from MQTT broadcast topics)
@@ -204,9 +205,32 @@ class WeishauptNwpmLocal extends utils.Adapter {
             return;
         }
         const key = id.split(".").slice(2).join(".");
-        const point = MQTT_POINTS.find((p) => p.id === key);
-        if (!point || !point.writable) return;
+        const entry = [...MQTT_MONITOR, ...MQTT_POINTS].find((p) => p.id === key);
+        if (!entry || !entry.writable) return;
 
+        // Time points: value "HH:MM" -> write hour + minute registers
+        if (entry.time) {
+            const m = String(state.val).match(/^(\d{1,2}):(\d{2})$/);
+            if (!m) {
+                this.log.warn(`Invalid time "${state.val}" for ${entry.name} (use HH:MM)`);
+                return;
+            }
+            const hh = Math.min(23, Math.max(0, Number(m[1])));
+            const mm = Math.min(59, Math.max(0, Number(m[2])));
+            const r1 = await this.mqtt.write(entry.time[0], hh);
+            const r2 = await this.mqtt.write(entry.time[1], mm);
+            if (r1 && r1.status === 0 && r2 && r2.status === 0) {
+                await this.setStateAsync(id, {
+                    val: `${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}`, ack: true,
+                });
+                this.log.info(`Set ${entry.name} = ${hh}:${mm}`);
+            } else {
+                this.log.warn(`Write ${entry.name} failed`);
+            }
+            return;
+        }
+
+        const point = entry;
         let value = state.val;
         if (point.type === "number") {
             value = Number(value);
