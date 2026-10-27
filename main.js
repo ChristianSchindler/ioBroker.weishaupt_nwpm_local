@@ -3,7 +3,7 @@
 const utils = require("@iobroker/adapter-core");
 const ModbusRTU = require("modbus-serial");
 const { MqttClient } = require("./lib/mqttClient");
-const { HOLDING, COILS, MQTT_MONITOR, MQTT_POINTS } = require("./lib/registers");
+const { HOLDING, COILS, SMART_GRID, MQTT_MONITOR, MQTT_POINTS, RENAMED } = require("./lib/registers");
 
 class WeishauptNwpmLocal extends utils.Adapter {
     constructor(options) {
@@ -30,8 +30,9 @@ class WeishauptNwpmLocal extends utils.Adapter {
         this.pollInterval = Math.max(5, Number(this.config.pollInterval) || 30);
 
         await this.createObjects();
+        await this.migrateRenamedStates();
 
-        // Writable states (control.* and some hotWater.*) -> listen for changes.
+        // Writable states (control.*, drinkingWater.*, heatingWater.*) -> listen for changes.
         if (this.config.enableControl) {
             this.subscribeStates("*");
             await this.connectMqtt();
@@ -57,6 +58,10 @@ class WeishauptNwpmLocal extends utils.Adapter {
                 name: r.name, type: "boolean", role: r.role, read: true, write: false,
             });
         }
+        await mk(SMART_GRID.id, {
+            name: SMART_GRID.name, type: "number", role: SMART_GRID.role, states: SMART_GRID.states,
+            read: true, write: false,
+        });
         if (this.config.enableControl) {
             for (const r of MQTT_MONITOR) {
                 const common = {
@@ -115,6 +120,22 @@ class WeishauptNwpmLocal extends utils.Adapter {
         return num;
     }
 
+    // States were regrouped under drinkingWater.* / heatingWater.*. Carry custom settings such as
+    // InfluxDB logging over to the new object, then remove the old one.
+    async migrateRenamedStates() {
+        for (const [oldId, newId] of Object.entries(RENAMED)) {
+            const oldObj = await this.getObjectAsync(oldId);
+            if (!oldObj) continue;
+            const custom = oldObj.common && oldObj.common.custom;
+            const newObj = await this.getObjectAsync(newId);
+            if (custom && newObj && !(newObj.common && newObj.common.custom)) {
+                await this.extendObjectAsync(newId, { common: { custom } });
+            }
+            await this.delObjectAsync(oldId);
+            this.log.info(`Renamed state ${oldId} -> ${newId}`);
+        }
+    }
+
     async connectModbus() {
         this.modbus = new ModbusRTU();
         this.modbus.setTimeout(5000);
@@ -158,6 +179,9 @@ class WeishauptNwpmLocal extends utils.Adapter {
                 const res = await this.modbus.readCoils(r.addr, 1);
                 await this.setStateChangedAsync(r.id, { val: !!res.data[0], ack: true });
             }
+            const sg = await this.modbus.readCoils(SMART_GRID.addr, Object.keys(SMART_GRID.states).length);
+            const sgIndex = Object.keys(SMART_GRID.states).findIndex((_, i) => sg.data[i]);
+            if (sgIndex >= 0) await this.setStateChangedAsync(SMART_GRID.id, { val: sgIndex, ack: true });
             await this.setStateAsync("info.connection", { val: true, ack: true });
 
             if (this.config.enableControl && this.mqtt && this.mqtt.connected) {
@@ -171,7 +195,18 @@ class WeishauptNwpmLocal extends utils.Adapter {
                 }
                 // Derived: electrical energy consumed = produced heat - environmental heat.
                 if (eGenerated !== null && eEnvironmental !== null) {
-                    const electrical = Math.round((eGenerated - eEnvironmental) * 1000) / 1000;
+                    let electrical = Math.round((eGenerated - eEnvironmental) * 1000) / 1000;
+                    // Both inputs are whole-kWh counters ticking independently, so the difference
+                    // jitters by ±1 kWh (e.g. 4673 -> 4672 -> 4673). Ignore drops of <= 1 kWh to keep
+                    // the counter monotonic; larger drops (counter reset) still pass through.
+                    if (this.lastElectrical === undefined) {
+                        const st = await this.getStateAsync("energy.electrical");
+                        this.lastElectrical = st && typeof st.val === "number" ? st.val : null;
+                    }
+                    if (this.lastElectrical !== null && electrical < this.lastElectrical && electrical >= this.lastElectrical - 1) {
+                        electrical = this.lastElectrical;
+                    }
+                    this.lastElectrical = electrical;
                     await this.setStateChangedAsync("energy.electrical", { val: electrical, ack: true });
                     if (electrical > 0) {
                         await this.setStateChangedAsync("energy.cop", { val: Math.round((eGenerated / electrical) * 100) / 100, ack: true });
