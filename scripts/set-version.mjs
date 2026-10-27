@@ -29,4 +29,10 @@ for (const key of Object.keys(io.common.news || {})) {
 io.common.news = news;
 writeFileSync("io-package.json", JSON.stringify(io, null, 2) + "\n");
 
+// README.md: turn the "### (unreleased)" changelog heading into this version
+const readme = readFileSync("README.md", "utf8");
+if (readme.includes("### (unreleased)")) {
+    writeFileSync("README.md", readme.replace("### (unreleased)", `### ${version}`));
+}
+
 console.log(`Set version ${version}`);
