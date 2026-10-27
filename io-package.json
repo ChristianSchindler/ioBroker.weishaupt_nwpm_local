@@ -1,8 +1,12 @@
 {
   "common": {
     "name": "weishaupt_nwpm_local",
-    "version": "0.1.2",
+    "version": "0.2.0",
     "news": {
+      "0.2.0": {
+        "en": "BREAKING: states regrouped under drinkingWater.* (Trinkwasser) and heatingWater.* (Heizwasser) - old states are migrated automatically incl. InfluxDB/history settings, update Grafana queries + scripts. New: heating setpoint/status, heating setback/raise times, DHW setback temperature, SG-Ready              (smartGrid.*), derived electricity use + COP. Fix: energy.electrical no longer jumps by 1 kWh",
+        "de": "BREAKING: states regrouped under drinkingWater.* (Trinkwasser) and heatingWater.* (Heizwasser) - old states are migrated automatically incl. InfluxDB/history settings, update Grafana queries + scripts. New: heating setpoint/status, heating setback/raise times, DHW setback temperature, SG-Ready              (smartGrid.*), derived electricity use + COP. Fix: energy.electrical no longer jumps by 1 kWh"
+      },
       "0.1.2": {
         "en": "dd derived electrical energy (energy.electrical) and COP (energy.cop); rename hotWater.setTemperature to hotWater.currentSetpoint and group setback times under hotWater.setback.*",
         "de": "dd derived electrical energy (energy.electrical) and COP (energy.cop); rename hotWater.setTemperature to hotWater.currentSetpoint and group setback times under hotWater.setback.*"

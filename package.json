@@ -1,6 +1,6 @@
 {
   "name": "iobroker.weishaupt_nwpm_local",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Local Weishaupt / Dimplex heat-pump data via the NWPM gateway (Modbus TCP + MQTT) - no cloud required",
   "author": {
     "name": "Christian Schindler",

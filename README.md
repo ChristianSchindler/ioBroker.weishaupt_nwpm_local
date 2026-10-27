@@ -148,7 +148,7 @@ point list. Issues and pull requests welcome.
 
 ## Changelog
 
-### (unreleased)
+### 0.2.0
 
 - `energy.electrical` no longer flaps by ±1 kWh (it is `generated − environmental`, two
   independently ticking whole-kWh counters). Drops of <= 1 kWh are ignored so the counter
